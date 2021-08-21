@@ -1,6 +1,6 @@
 {
     "host": "localhost",
-    "port": 50518,
+    "port": 25565,
     "username": "minehelper-bot",
     "password": null,
     "version": null
