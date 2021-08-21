@@ -1,0 +1,24 @@
+{
+  "name": "minehelper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/minehelper.js",
+  "bin": {
+    "minehelper": "bin/minehelper"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "olix3001",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^8.1.0",
+    "minecraft-data": "^2.91.1",
+    "mineflayer": "^3.10.0",
+    "mineflayer-pathfinder": "^1.7.0",
+    "signale": "^1.4.0"
+  },
+  "devDependencies": {}
+}
