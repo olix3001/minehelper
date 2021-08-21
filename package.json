@@ -15,6 +15,7 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "commander": "^8.1.0",
+    "inquirer": "^8.1.2",
     "minecraft-data": "^2.91.1",
     "mineflayer": "^3.10.0",
     "mineflayer-pathfinder": "^1.7.0",

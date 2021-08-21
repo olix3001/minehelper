@@ -43,7 +43,7 @@ module.exports = (program) => {
 
             // go to player
             signale.info('going to the afk location');
-            await bot.pathfinder.goto(new GoalBlock(position.x, position.y, position.z));
+            await bot.pathfinder.setGoal(new GoalBlock(position.x, position.y, position.z), true);
             await bot.look(rotation[1], rotation[0]);
 
             signale.success('bot is now afking');
