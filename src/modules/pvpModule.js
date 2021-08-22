@@ -1,9 +1,11 @@
 const { bgYellow } = require("chalk");
 const inquirer = require("inquirer");
 const { goals } = require("mineflayer-pathfinder");
+const { await } = require("signale");
 const basicUtils = require("../utils/basicUtils");
 
 var swordmap = {};
+var lastSuperEat = {};
 
 async function ensureSword(bot) {
     if (!(bot in swordmap)) {
@@ -12,7 +14,20 @@ async function ensureSword(bot) {
         }
     }
     if (bot in swordmap)
-        bot.equip(swordmap[bot], 'hand');
+        await bot.equip(swordmap[bot], 'hand');
+}
+
+async function eat(bot, selector) {
+    await selectFirst(bot, await selector(bot));
+    await bot.activateItem();
+    await basicUtils.wait(1700);
+    await bot.deactivateItem();
+    await ensureSword(bot);
+}
+
+async function selectFirst(bot, array) {
+    if (array.length <= 0) return;
+    await bot.equip(array[0], 'hand');
 }
 
 async function attemptAttack(bot, entity) {
@@ -34,10 +49,25 @@ async function attemptAttack(bot, entity) {
         // attack
         await bot.attack(entity);
 
+        // eat if low hp and food
+        if (bot.food < 10) {
+            await eat(bot, food);
+        }
+
+        // if very low hp then eat super food
+        if (bot.health < 8) {
+            if (!(bot in lastSuperEat) || lastSuperEat[bot] < Date.now() - 2500) {
+                await eat(bot, superFood);
+                lastSuperEat[bot] = Date.now();
+            }
+        }
+
+
         // activate shield
         if (shield) {
             await basicUtils.wait(100);
             await bot.activateItem(true);
+
         }
     } else {
         if (shield && !bot.usingHeldItem) await bot.deactivateItem();
@@ -49,6 +79,23 @@ async function hasShield(bot) {
     if (!slot) return false;
 
     return slot.name.includes('shield');
+}
+
+async function food(bot) {
+    let food = []
+    for (let item of await bot.inventory.items()) {
+        if (item.name == 'cooked_beef') food.push(item);
+    }
+    return food;
+}
+
+async function superFood(bot) { // golden apples itd...
+    let food = []
+    for (let item of await bot.inventory.items()) {
+        if (item.name == 'golden_apple') food.push(item);
+        else if (item.name == 'enchanted_golden_apple') food.push(item);
+    }
+    return food;
 }
 
 module.exports = {
@@ -92,8 +139,15 @@ module.exports = {
     hunt: async (bot, entity) => {
 
         bot.pathfinder.setGoal(new goals.GoalFollow(entity, 3), true);
-        var interval = setInterval(async () => {
-            attemptAttack(bot, entity)
+
+        var stop = false;
+
+        setTimeout(async () => {
+            while (true) {
+                if (stop) return;
+                await attemptAttack(bot, entity);
+                await basicUtils.wait(750);
+            }
         }, 1000);
         var lookInterval = setInterval(async () => {
             if (entity.position.distanceTo(bot.entity.position) < 7)
@@ -103,7 +157,7 @@ module.exports = {
         return new Promise(async resolve => {
             bot.on('entityDead', (dead) => {
                 if (dead.uuid == entity.uuid) {
-                    clearInterval(interval);
+                    stop = true;
                     clearInterval(lookInterval);
                     resolve();
                 }
