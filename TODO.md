@@ -9,4 +9,5 @@
 | :x:                | give command (go to the player and toss) |
 | :x:                | deliver command (deliver item to the other player) |
 | :x:                | hunt command (hunt for a specified mob type/s) |
+| :x:                | build command (build a schematic from worldedit/litematica) |
 | :x:                | afk protection for afk command |

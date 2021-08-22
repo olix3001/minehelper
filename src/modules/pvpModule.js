@@ -9,8 +9,8 @@ var lastSuperEat = {};
 
 async function ensureSword(bot) {
     if (!(bot in swordmap)) {
-        for (item of bot.inventory.items()) {
-            if (item.name.includes('sword') || item.name.includes('axe')) swordmap[bot] = item;
+        for (let item of bot.inventory.items()) {
+            if (item.name.includes('sword') || item.name.includes('_axe')) swordmap[bot] = item;
         }
     }
     if (bot in swordmap)
@@ -32,9 +32,27 @@ async function selectFirst(bot, array) {
 
 async function attemptAttack(bot, entity) {
     const shield = await hasShield(bot);
+
+    // eat if low hp and food
+    if (bot.food < 10) {
+        if (shield) bot.deactivateItem();
+        await eat(bot, food);
+        if (shield) bot.activateItem(true);
+    }
+
+    // if very low hp then eat super food
+    if (bot.health < 8) {
+        if (!(bot in lastSuperEat) || lastSuperEat[bot] < Date.now() - 2500) {
+            if (shield) bot.deactivateItem();
+            await eat(bot, superFood);
+            lastSuperEat[bot] = Date.now();
+            if (shield) bot.activateItem(true);
+        }
+    }
+
     if (entity.position.distanceTo(bot.entity.position) < 6) {
         // ensure that bot is holding a weapon
-        ensureSword(bot);
+        await ensureSword(bot);
 
         // jump and wait for perfect timing
         await bot.setControlState('jump', true);
@@ -48,20 +66,6 @@ async function attemptAttack(bot, entity) {
 
         // attack
         await bot.attack(entity);
-
-        // eat if low hp and food
-        if (bot.food < 10) {
-            await eat(bot, food);
-        }
-
-        // if very low hp then eat super food
-        if (bot.health < 8) {
-            if (!(bot in lastSuperEat) || lastSuperEat[bot] < Date.now() - 2500) {
-                await eat(bot, superFood);
-                lastSuperEat[bot] = Date.now();
-            }
-        }
-
 
         // activate shield
         if (shield) {
@@ -118,7 +122,6 @@ module.exports = {
                 bot.equip(bot.inventory.slots[slot], 'feet');
             } else if (newItem.name.includes('sword') || newItem.name.includes('axe')) {
                 bot.equip(bot.inventory.slots[slot], 'hand');
-                swordmap[bot] = bot.inventory.slots[slot];
             }
         });
 
