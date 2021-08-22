@@ -167,4 +167,8 @@ module.exports = {
             })
         })
     },
+
+    eat: eat,
+    food: food,
+    superFood: superFood
 }

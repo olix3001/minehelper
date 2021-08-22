@@ -19,6 +19,7 @@ npm i git+https://github.com/olix3001/minehelper -g
 - `toss` - toss all items onto the ground
 - `kill <player>` - kill a specified player
 - `army <size> <player>` - kill a specified player using an army of size
+- `mine <blocks>` - mine specified block/s automatically
 More commands coming soon
 
 
