@@ -25,3 +25,6 @@ More commands coming soon
 
 # Special thanks
 This bot uses [Mineflayer](https://github.com/PrismarineJS/mineflayer) project to communicate with minecraft
+
+# DEPRECATED
+This project was discontinued because I'm lazy :D
